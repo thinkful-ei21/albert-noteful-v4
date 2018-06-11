@@ -3,12 +3,19 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
-const { PORT, MONGODB_URI } = require('./config');
+const { PORT, MONGODB_URI } = require('./config.js');
+const localStrategy = require('./passport/local.js');
 
-const notesRouter = require('./routes/notes');
-const foldersRouter = require('./routes/folders');
-const tagsRouter = require('./routes/tags');
+const authRouter = require('./routes/auth.js');
+const usersRouter = require('./routes/users.js');
+const notesRouter = require('./routes/notes.js');
+const foldersRouter = require('./routes/folders.js');
+const tagsRouter = require('./routes/tags.js');
+
+// Configure Passport to utilize localStrategy
+passport.use(localStrategy);
 
 // Create an Express application
 const app = express();
@@ -25,6 +32,8 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // Mount routers
+app.use('/api', authRouter);
+app.use('/api', usersRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/folders', foldersRouter);
 app.use('/api/tags', tagsRouter);
@@ -58,7 +67,7 @@ if (process.env.NODE_ENV !== 'test') {
       console.error(err);
     });
 
-  app.listen(PORT, function () {
+  app.listen(PORT, function() {
     console.info(`Server listening on ${this.address().port}`);
   }).on('error', err => {
     console.error(err);

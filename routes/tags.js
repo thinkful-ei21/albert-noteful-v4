@@ -3,8 +3,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-const Tag = require('../models/tag');
-const Note = require('../models/note');
+const Tag = require('../models/tag.js');
+const Note = require('../models/note.js');
 
 const router = express.Router();
 

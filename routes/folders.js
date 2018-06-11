@@ -3,8 +3,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-const Folder = require('../models/folder');
-const Note = require('../models/note');
+const Folder = require('../models/folder.js');
+const Note = require('../models/note.js');
 
 const router = express.Router();
 
