@@ -35,7 +35,7 @@ app.use(express.json());
 
 // Mount routers
 app.use('/api', authRouter);
-app.use('/api', usersRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/folders', foldersRouter);
 app.use('/api/tags', tagsRouter);

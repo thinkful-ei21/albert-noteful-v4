@@ -91,6 +91,9 @@ router.post('/', jwtAuth, (req, res, next) => {
   }
 
   const newNote = { title, content, folderId, tags };
+  if(!folderId) {
+    newNote.folderId = null;
+  }
 
   Note
     .create(newNote)
@@ -136,6 +139,9 @@ router.put('/:id', jwtAuth, (req, res, next) => {
   }
 
   const updateNote = { title, content, folderId, tags };
+  if(!folderId) {
+    updateNote.folderId = null;
+  }
 
   Note
     .findByIdAndUpdate(id, updateNote, { new: true })

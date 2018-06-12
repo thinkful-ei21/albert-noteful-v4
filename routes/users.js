@@ -7,7 +7,7 @@ const User = require('../models/user.js');
 const router = express.Router();
 
 // POST (create) a new user
-router.post('/users', (req, res, next) => {
+router.post('/', (req, res, next) => {
   const { fullname, username, password } = req.body;
 
   // verify required fields exist
