@@ -2,16 +2,19 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const Tag = require('../models/tag.js');
 const Note = require('../models/note.js');
 
 const router = express.Router();
+const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: true });
 
 /* ========== GET/READ ALL ITEMS ========== */
-router.get('/', (req, res, next) => {
+router.get('/', jwtAuth, (req, res, next) => {
 
-  Tag.find()
+  Tag
+    .find()
     .sort('name')
     .then(results => {
       res.json(results);
@@ -22,17 +25,18 @@ router.get('/', (req, res, next) => {
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
 
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  if(!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
   }
 
-  Tag.findById(id)
+  Tag
+    .findById(id)
     .then(result => {
       if (result) {
         res.json(result);
@@ -46,24 +50,28 @@ router.get('/:id', (req, res, next) => {
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', (req, res, next) => {
+router.post('/', jwtAuth, (req, res, next) => {
   const { name } = req.body;
 
   const newTag = { name };
 
   /***** Never trust users - validate input *****/
-  if (!name) {
+  if(!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err);
   }
 
-  Tag.create(newTag)
+  Tag
+    .create(newTag)
     .then(result => {
-      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+      res
+        .location(`${req.originalUrl}/${result.id}`)
+        .status(201)
+        .json(result);
     })
     .catch(err => {
-      if (err.code === 11000) {
+      if(err.code === 11000) {
         err = new Error('Tag name already exists');
         err.status = 400;
       }
@@ -72,18 +80,17 @@ router.post('/', (req, res, next) => {
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', (req, res, next) => {
+router.put('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
 
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  if(!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
   }
-
-  if (!name) {
+  if(!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err);
@@ -91,16 +98,17 @@ router.put('/:id', (req, res, next) => {
 
   const updateTag = { name };
 
-  Tag.findByIdAndUpdate(id, updateTag, { new: true })
+  Tag
+    .findByIdAndUpdate(id, updateTag, { new: true })
     .then(result => {
-      if (result) {
+      if(result) {
         res.json(result);
       } else {
         next();
       }
     })
     .catch(err => {
-      if (err.code === 11000) {
+      if(err.code === 11000) {
         err = new Error('Tag name already exists');
         err.status = 400;
       }
@@ -109,11 +117,11 @@ router.put('/:id', (req, res, next) => {
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
 
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  if(!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
@@ -126,7 +134,8 @@ router.delete('/:id', (req, res, next) => {
     { $pull: { tags: id } }
   );
 
-  Promise.all([tagRemovePromise, noteUpdatePromise])
+  Promise
+    .all([tagRemovePromise, noteUpdatePromise])
     .then(() => {
       res.sendStatus(204).end();
     })

@@ -7,6 +7,7 @@ const passport = require('passport');
 
 const { PORT, MONGODB_URI } = require('./config.js');
 const localStrategy = require('./passport/local.js');
+const jwtStrategy = require('./passport/jwt.js');
 
 const authRouter = require('./routes/auth.js');
 const usersRouter = require('./routes/users.js');
@@ -16,6 +17,7 @@ const tagsRouter = require('./routes/tags.js');
 
 // Configure Passport to utilize strategies, this just loads into memory
 passport.use(localStrategy);
+passport.use(jwtStrategy);
 
 // Create an Express application
 const app = express();

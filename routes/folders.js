@@ -2,16 +2,19 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const Folder = require('../models/folder.js');
 const Note = require('../models/note.js');
 
 const router = express.Router();
+const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: true });
 
 /* ========== GET/READ ALL ITEMS ========== */
-router.get('/', (req, res, next) => {
+router.get('/', jwtAuth, (req, res, next) => {
 
-  Folder.find()
+  Folder
+    .find()
     .sort('name')
     .then(results => {
       res.json(results);
@@ -22,18 +25,20 @@ router.get('/', (req, res, next) => {
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  /***** Never trust users - validate input *****/
+  if(!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
   }
 
-  Folder.findById(id)
+  Folder
+    .findById(id)
     .then(result => {
-      if (result) {
+      if(result) {
         res.json(result);
       } else {
         next();
@@ -45,24 +50,25 @@ router.get('/:id', (req, res, next) => {
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', (req, res, next) => {
+router.post('/', jwtAuth, (req, res, next) => {
   const { name } = req.body;
 
   const newFolder = { name };
 
   /***** Never trust users - validate input *****/
-  if (!name) {
+  if(!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err);
   }
 
-  Folder.create(newFolder)
+  Folder
+    .create(newFolder)
     .then(result => {
       res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
     .catch(err => {
-      if (err.code === 11000) {
+      if(err.code === 11000) {
         err = new Error('Folder name already exists');
         err.status = 400;
       }
@@ -71,18 +77,17 @@ router.post('/', (req, res, next) => {
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', (req, res, next) => {
+router.put('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
 
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  if(!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
   }
-
-  if (!name) {
+  if(!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err);
@@ -90,16 +95,17 @@ router.put('/:id', (req, res, next) => {
 
   const updateFolder = { name };
 
-  Folder.findByIdAndUpdate(id, updateFolder, { new: true })
+  Folder
+    .findByIdAndUpdate(id, updateFolder, { new: true })
     .then(result => {
-      if (result) {
+      if(result) {
         res.json(result);
       } else {
         next();
       }
     })
     .catch(err => {
-      if (err.code === 11000) {
+      if(err.code === 11000) {
         err = new Error('Folder name already exists');
         err.status = 400;
       }
@@ -108,11 +114,11 @@ router.put('/:id', (req, res, next) => {
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
 
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  if(!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
@@ -128,7 +134,8 @@ router.delete('/:id', (req, res, next) => {
     { $unset: { folderId: '' } }
   );
 
-  Promise.all([folderRemovePromise, noteRemovePromise])
+  Promise
+    .all([folderRemovePromise, noteRemovePromise])
     .then(() => {
       res.sendStatus(204);
     })
