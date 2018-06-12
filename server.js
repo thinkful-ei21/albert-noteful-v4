@@ -14,7 +14,7 @@ const notesRouter = require('./routes/notes.js');
 const foldersRouter = require('./routes/folders.js');
 const tagsRouter = require('./routes/tags.js');
 
-// Configure Passport to utilize localStrategy
+// Configure Passport to utilize strategies, this just loads into memory
 passport.use(localStrategy);
 
 // Create an Express application
