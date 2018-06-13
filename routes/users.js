@@ -16,7 +16,7 @@ router.post('/', (req, res, next) => {
     field =>
       !(field in req.body));
 
-  if(missingField) {
+  if (missingField) {
     const err = new Error();
     err.message = `Missing '${missingField}' in request body`;
     err.status = 422;
@@ -30,7 +30,7 @@ router.post('/', (req, res, next) => {
       field in req.body && typeof req.body[field] !== 'string'
   );
 
-  if(nonStringField) {
+  if (nonStringField) {
     const err = new Error();
     err.message = 'Incorrect field type: expected string';
     err.status = 422;
@@ -43,7 +43,7 @@ router.post('/', (req, res, next) => {
     field =>
       req.body[field].trim() !== req.body[field]);
 
-  if(nonTrimmedField) {
+  if (nonTrimmedField) {
     const err = new Error();
     err.message = 'Cannot start or end with whitespace';
     err.status = 422;
@@ -69,7 +69,7 @@ router.post('/', (req, res, next) => {
       'max' in sizedFields[field] && req.body[field].trim().length > sizedFields[field].max
   );
 
-  if(tooSmallField || tooLargeField) {
+  if (tooSmallField || tooLargeField) {
     const err = new Error();
     err.message = 'Field too long or too short...?';
     err.status = 422;

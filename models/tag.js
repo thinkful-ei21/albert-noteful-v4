@@ -3,8 +3,13 @@
 const mongoose = require('mongoose');
 
 const tagSchema = new mongoose.Schema({
-  name: { type: String, unique: true, required: true }
+  name: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 });
+
+// Compound index, this makes sure that unique tag name applies to only one user
+// the 1 there is an option for true, do not use the true keyword
+tagSchema.index({ name: 1, userId: 1 }, { unique: true });
 
 // Add `createdAt` and `updatedAt` fields
 tagSchema.set('timestamps', true);

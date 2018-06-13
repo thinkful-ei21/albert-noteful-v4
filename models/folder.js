@@ -3,8 +3,13 @@
 const mongoose = require('mongoose');
 
 const folderSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true }
+  name: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 });
+
+// Compound index, this makes sure that unique folder name applies to only one user
+// the 1 there is an option for true, do not use the true keyword
+folderSchema.index({ name: 1, userId: 1 }, { unique: true });
 
 // Add `createdAt` and `updatedAt` fields
 folderSchema.set('timestamps', true);

@@ -16,19 +16,19 @@ router.get('/', jwtAuth, (req, res, next) => {
 
   let filter = {};
 
-  if(userId) {
+  if (userId) {
     filter.userId = userId;
   }
-  if(searchTerm) {
+  if (searchTerm) {
     // filter.title = { $regex: searchTerm, $options: 'i' };
     // Mini-Challenge: Search both `title` and `content`
     const re = new RegExp(searchTerm, 'i');
     filter.$or = [{ 'title': re }, { 'content': re }];
   }
-  if(folderId) {
+  if (folderId) {
     filter.folderId = folderId;
   }
-  if(tagId) {
+  if (tagId) {
     filter.tags = tagId;
   }
 
@@ -49,7 +49,7 @@ router.get('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
 
-  if(!mongoose.Types.ObjectId.isValid(id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
@@ -59,7 +59,7 @@ router.get('/:id', jwtAuth, (req, res, next) => {
     .findOne({_id: id, userId: userId})
     .populate('tags')
     .then(result => {
-      if(result) {
+      if (result) {
         res.json(result);
       } else {
         next();
@@ -76,17 +76,17 @@ router.post('/', jwtAuth, (req, res, next) => {
   const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
-  if(!title) {
+  if (!title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
-  if(folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
+  if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
     const err = new Error('The `folderId` is not valid');
     err.status = 400;
     return next(err);
   }
-  if(tags) {
+  if (tags) {
     tags.forEach((tag) => {
       if (!mongoose.Types.ObjectId.isValid(tag)) {
         const err = new Error('The tags `id` is not valid');
@@ -97,7 +97,7 @@ router.post('/', jwtAuth, (req, res, next) => {
   }
 
   const newNote = { title, content, userId, folderId, tags };
-  if(!folderId) {
+  if (!folderId) {
     newNote.folderId = null;
   }
 
@@ -121,24 +121,24 @@ router.put('/:id', jwtAuth, (req, res, next) => {
   const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
-  if(!mongoose.Types.ObjectId.isValid(id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
   }
-  if(title === '') {
+  if (title === '') {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
-  if(folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
+  if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
     const err = new Error('The `folderId` is not valid');
     err.status = 400;
     return next(err);
   }
-  if(tags) {
+  if (tags) {
     const badIds = tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
-    if(badIds.length) {
+    if (badIds.length) {
       const err = new Error('The tags `id` is not valid');
       err.status = 400;
       return next(err);
@@ -146,7 +146,7 @@ router.put('/:id', jwtAuth, (req, res, next) => {
   }
 
   const updateNote = { title, content, userId, folderId, tags };
-  if(!folderId) {
+  if (!folderId) {
     updateNote.folderId = null;
   }
 
@@ -154,7 +154,7 @@ router.put('/:id', jwtAuth, (req, res, next) => {
     // .findByIdAndUpdate(id, updateNote, { new: true })
     .findOneAndUpdate({_id: id, userId}, updateNote, {new: true})
     .then(result => {
-      if(result) {
+      if (result) {
         res.json(result);
       } else {
         next();
@@ -171,7 +171,7 @@ router.delete('/:id', jwtAuth, (req, res, next) => {
   const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
-  if(!mongoose.Types.ObjectId.isValid(id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);

@@ -12,9 +12,10 @@ const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: tr
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', jwtAuth, (req, res, next) => {
+  const userId = req.user.id;
 
   Folder
-    .find()
+    .find({ userId })
     .sort('name')
     .then(results => {
       res.json(results);
@@ -27,18 +28,19 @@ router.get('/', jwtAuth, (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
-  if(!mongoose.Types.ObjectId.isValid(id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
   }
 
   Folder
-    .findById(id)
+    .findOne({_id: id, userId})
     .then(result => {
-      if(result) {
+      if (result) {
         res.json(result);
       } else {
         next();
@@ -51,13 +53,19 @@ router.get('/:id', jwtAuth, (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', jwtAuth, (req, res, next) => {
+  const userId = req.user.id;
   const { name } = req.body;
 
-  const newFolder = { name };
+  const newFolder = { name, userId };
 
   /***** Never trust users - validate input *****/
-  if(!name) {
+  if (!name) {
     const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
+  if (!userId) {
+    const err = new Error('Missing `userId` in request body');
     err.status = 400;
     return next(err);
   }
@@ -65,10 +73,13 @@ router.post('/', jwtAuth, (req, res, next) => {
   Folder
     .create(newFolder)
     .then(result => {
-      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+      res
+        .location(`${req.originalUrl}/${result.id}`)
+        .status(201)
+        .json(result);
     })
     .catch(err => {
-      if(err.code === 11000) {
+      if (err.code === 11000) {
         err = new Error('Folder name already exists');
         err.status = 400;
       }
@@ -80,14 +91,20 @@ router.post('/', jwtAuth, (req, res, next) => {
 router.put('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
-  if(!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is invalid');
     err.status = 400;
     return next(err);
   }
-  if(!name) {
+  if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+    const err = new Error('The `userId` is missing or invalid');
+    err.status = 400;
+    return next(err);
+  }
+  if (!name) {
     const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err);
@@ -96,16 +113,16 @@ router.put('/:id', jwtAuth, (req, res, next) => {
   const updateFolder = { name };
 
   Folder
-    .findByIdAndUpdate(id, updateFolder, { new: true })
+    .findOneAndUpdate({_id: id, userId}, updateFolder, { new: true })
     .then(result => {
-      if(result) {
+      if (result) {
         res.json(result);
       } else {
         next();
       }
     })
     .catch(err => {
-      if(err.code === 11000) {
+      if (err.code === 11000) {
         err = new Error('Folder name already exists');
         err.status = 400;
       }
@@ -115,17 +132,18 @@ router.put('/:id', jwtAuth, (req, res, next) => {
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', jwtAuth, (req, res, next) => {
+  const userId = req.user.id;
   const { id } = req.params;
 
   /***** Never trust users - validate input *****/
-  if(!mongoose.Types.ObjectId.isValid(id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
     return next(err);
   }
 
   // ON DELETE SET NULL equivalent
-  const folderRemovePromise = Folder.findByIdAndRemove(id);
+  const folderRemovePromise = Folder.findOneAndRemove({_id: id, userId});
   // ON DELETE CASCADE equivalent
   // const noteRemovePromise = Note.deleteMany({ folderId: id });
 
@@ -137,7 +155,9 @@ router.delete('/:id', jwtAuth, (req, res, next) => {
   Promise
     .all([folderRemovePromise, noteRemovePromise])
     .then(() => {
-      res.sendStatus(204);
+      res
+        .sendStatus(204)
+        .end();
     })
     .catch(err => {
       next(err);
