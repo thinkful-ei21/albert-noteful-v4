@@ -12,9 +12,13 @@ const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: tr
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', jwtAuth, (req, res, next) => {
   const { searchTerm, folderId, tagId } = req.query;
+  const userId = req.user.id;
 
   let filter = {};
 
+  if(userId) {
+    filter.userId = userId;
+  }
   if(searchTerm) {
     // filter.title = { $regex: searchTerm, $options: 'i' };
     // Mini-Challenge: Search both `title` and `content`
@@ -43,6 +47,7 @@ router.get('/', jwtAuth, (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
   if(!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
@@ -51,7 +56,7 @@ router.get('/:id', jwtAuth, (req, res, next) => {
   }
 
   Note
-    .findById(id)
+    .findOne({_id: id, userId: userId})
     .populate('tags')
     .then(result => {
       if(result) {
@@ -68,6 +73,7 @@ router.get('/:id', jwtAuth, (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', jwtAuth, (req, res, next) => {
   const { title, content, folderId, tags = [] } = req.body;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
   if(!title) {
@@ -90,7 +96,7 @@ router.post('/', jwtAuth, (req, res, next) => {
     });
   }
 
-  const newNote = { title, content, folderId, tags };
+  const newNote = { title, content, userId, folderId, tags };
   if(!folderId) {
     newNote.folderId = null;
   }
@@ -112,6 +118,7 @@ router.post('/', jwtAuth, (req, res, next) => {
 router.put('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
   const { title, content, folderId, tags = [] } = req.body;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
   if(!mongoose.Types.ObjectId.isValid(id)) {
@@ -138,13 +145,14 @@ router.put('/:id', jwtAuth, (req, res, next) => {
     }
   }
 
-  const updateNote = { title, content, folderId, tags };
+  const updateNote = { title, content, userId, folderId, tags };
   if(!folderId) {
     updateNote.folderId = null;
   }
 
   Note
-    .findByIdAndUpdate(id, updateNote, { new: true })
+    // .findByIdAndUpdate(id, updateNote, { new: true })
+    .findOneAndUpdate({_id: id, userId}, updateNote, {new: true})
     .then(result => {
       if(result) {
         res.json(result);
@@ -160,6 +168,7 @@ router.put('/:id', jwtAuth, (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', jwtAuth, (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
   if(!mongoose.Types.ObjectId.isValid(id)) {
@@ -169,7 +178,7 @@ router.delete('/:id', jwtAuth, (req, res, next) => {
   }
 
   Note
-    .findByIdAndRemove(id)
+    .findOneAndRemove({_id: id, userId})
     .then(() => {
       res.sendStatus(204);
     })
