@@ -1,25 +1,26 @@
 [
   {
     "_id": "333333333333333333333300",
-    "fullname": "Bob User",
-    "username": "bobuser",
-    "password": "password"
+    "fullname": "Bruce Wayne",
+    "username": "batman",
+    "password": "$2a$10$UGpZvHcJkDUsgbHEieDI7.EYuRTka4P1wojOtSYJmGCQ4BH/BNNXy"
   },
   {
     "_id": "333333333333333333333301",
-    "fullname": "Pat User",
-    "username": "patuser",
-    "password": "password"
+    "fullname": "Dick Grayson",
+    "username": "nightwing",
+    "password": "$2a$10$UGpZvHcJkDUsgbHEieDI7.EYuRTka4P1wojOtSYJmGCQ4BH/BNNXy"
   },
   {
     "_id": "333333333333333333333302",
-    "fullname": "Jane User",
-    "username": "janeuser",
-    "password": "password"
+    "fullname": "Selina Kyle",
+    "username": "catwoman",
+    "password": "$2a$10$UGpZvHcJkDUsgbHEieDI7.EYuRTka4P1wojOtSYJmGCQ4BH/BNNXy"
   },
   {
     "_id": "333333333333333333333303",
-    "username": "anonuser",
-    "password": "password"
+    "fullname": "Harvey Dent",
+    "username": "twoface",
+    "password": "$2a$10$UGpZvHcJkDUsgbHEieDI7.EYuRTka4P1wojOtSYJmGCQ4BH/BNNXy"
   }
 ]
