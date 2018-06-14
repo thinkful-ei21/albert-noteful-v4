@@ -16,11 +16,5 @@
     "fullname": "Selina Kyle",
     "username": "catwoman",
     "password": "$2a$10$UGpZvHcJkDUsgbHEieDI7.EYuRTka4P1wojOtSYJmGCQ4BH/BNNXy"
-  },
-  {
-    "_id": "333333333333333333333303",
-    "fullname": "Harvey Dent",
-    "username": "twoface",
-    "password": "$2a$10$UGpZvHcJkDUsgbHEieDI7.EYuRTka4P1wojOtSYJmGCQ4BH/BNNXy"
   }
 ]
