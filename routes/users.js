@@ -8,8 +8,13 @@ const router = express.Router();
 
 // POST (create) a new user
 router.post('/', (req, res, next) => {
-  const { fullname, username, password } = req.body;
+  const { username, password } = req.body;
+  let { fullname } = req.body;
 
+  if(fullname) {
+    fullname = fullname.trim();
+  }
+  
   // verify required fields exist
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(
@@ -61,29 +66,27 @@ router.post('/', (req, res, next) => {
     }
   };
   const tooSmallField = Object.keys(sizedFields).find(
-    field =>
-      'min' in sizedFields[field] && req.body[field].trim().length < sizedFields[field].min
+    field => 'min' in sizedFields[field] &&
+      req.body[field].trim().length < sizedFields[field].min
   );
-  const tooLargeField = Object.keys(sizedFields).find(
-    field =>
-      'max' in sizedFields[field] && req.body[field].trim().length > sizedFields[field].max
-  );
-
-  if (tooSmallField || tooLargeField) {
+  if (tooSmallField) {
+    const min = sizedFields[tooSmallField].min;
     const err = new Error();
-    err.message = 'Field too long or too short...?';
+    err.message = `Field: '${tooSmallField}' must be at least ${min} characters long`;
     err.status = 422;
     return next(err);
-    // return res.status(422).json({
-    //   code: 422,
-    //   reason: 'ValidationError',
-    //   message: tooSmallField
-    //     ? `Must be at least ${sizedFields[tooSmallField]
-    //       .min} characters long`
-    //     : `Must be at most ${sizedFields[tooLargeField]
-    //       .max} characters long`,
-    //   location: tooSmallField || tooLargeField
-    // });
+  }
+
+  const tooLargeField = Object.keys(sizedFields).find(
+    field => 'max' in sizedFields[field] &&
+      req.body[field].trim().length > sizedFields[field].max
+  );
+  if (tooLargeField) {
+    const max = sizedFields[tooLargeField].max;
+    const err = new Error();
+    err.message = `Field: '${tooLargeField}' must be at most ${max} characters long`;
+    err.status = 422;
+    return next(err);
   }
 
   // all validations passed, hash password and create user
@@ -93,7 +96,7 @@ router.post('/', (req, res, next) => {
       const newUser = {
         username,
         password: digest,
-        fullname
+        fullname: fullname.trim()
       };
       return User.create(newUser);
     })
