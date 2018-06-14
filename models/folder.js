@@ -16,8 +16,8 @@ folderSchema.set('timestamps', true);
 
 // Customize output for `res.json(data)`, `console.log(data)` etc.
 folderSchema.set('toObject', {
-  virtuals: true,     // include built-in virtual `id`
-  versionKey: false,  // remove `__v` version key
+  virtuals: true, // include built-in virtual `id`
+  versionKey: false, // remove `__v` version key
   transform: (doc, ret) => {
     delete ret._id; // delete `_id`
   }

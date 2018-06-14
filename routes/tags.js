@@ -10,6 +10,9 @@ const Note = require('../models/note.js');
 const router = express.Router();
 const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: true });
 
+// Protects all endpoints, or each can be applied to specific handlers as below
+// router.use(jwtAuth);
+
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', jwtAuth, (req, res, next) => {
   const userId = req.user.id;

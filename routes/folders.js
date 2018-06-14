@@ -10,6 +10,9 @@ const Note = require('../models/note.js');
 const router = express.Router();
 const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: true });
 
+// Protects all endpoints, or each can be applied to specific handlers as below
+// router.use(jwtAuth);
+
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', jwtAuth, (req, res, next) => {
   const userId = req.user.id;
@@ -32,7 +35,8 @@ router.get('/:id', jwtAuth, (req, res, next) => {
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
+    const err = new Error();
+    err.message = 'The `id` is not valid';
     err.status = 400;
     return next(err);
   }
@@ -60,12 +64,14 @@ router.post('/', jwtAuth, (req, res, next) => {
 
   /***** Never trust users - validate input *****/
   if (!name) {
-    const err = new Error('Missing `name` in request body');
+    const err = new Error();
+    err.message = 'Missing `name` in request body';
     err.status = 400;
     return next(err);
   }
   if (!userId) {
-    const err = new Error('Missing `userId` in request body');
+    const err = new Error();
+    err.messge = 'Missing `userId` in request body';
     err.status = 400;
     return next(err);
   }
@@ -80,7 +86,8 @@ router.post('/', jwtAuth, (req, res, next) => {
     })
     .catch(err => {
       if (err.code === 11000) {
-        err = new Error('Folder name already exists');
+        err = new Error();
+        err.message = 'Folder name already exists';
         err.status = 400;
       }
       next(err);
@@ -95,17 +102,20 @@ router.put('/:id', jwtAuth, (req, res, next) => {
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is invalid');
+    const err = new Error();
+    err.message = 'The `id` is invalid';
     err.status = 400;
     return next(err);
   }
   if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-    const err = new Error('The `userId` is missing or invalid');
+    const err = new Error();
+    err.message = 'The `userId` is missing or invalid';
     err.status = 400;
     return next(err);
   }
   if (!name) {
-    const err = new Error('Missing `name` in request body');
+    const err = new Error();
+    err.message = 'Missing `name` in request body';
     err.status = 400;
     return next(err);
   }
@@ -123,7 +133,8 @@ router.put('/:id', jwtAuth, (req, res, next) => {
     })
     .catch(err => {
       if (err.code === 11000) {
-        err = new Error('Folder name already exists');
+        err = new Error();
+        err.message = 'Folder name already exists';
         err.status = 400;
       }
       next(err);
@@ -137,7 +148,8 @@ router.delete('/:id', jwtAuth, (req, res, next) => {
 
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
+    const err = new Error();
+    err.message = 'The `id` is not valid';
     err.status = 400;
     return next(err);
   }
