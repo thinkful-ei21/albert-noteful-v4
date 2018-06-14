@@ -38,21 +38,26 @@ const validateFolderId = function(folderId, userId) {
 };
 
 const validateTagIds = function(tags, userId) {
-  if (!tags) {
+  if (tags === undefined) {
     return Promise.resolve();
   }
-  if (!Array.isArray(tags)) {
-    const err = new Error();
-    err.message = 'The `tags` must be an array';
+  if(!Array.isArray(tags)) {
+    const err = new Error('The `tags` must be an array');
     err.status = 400;
     return Promise.reject(err);
   }
-  return Tag
-    .find({ $and: [{ _id: { $in: tags }, userId }] })
+
+  const badIds = tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
+  if (badIds.length) {
+    const err = new Error('The tags `id` is not valid');
+    err.status = 400;
+    return Promise.reject(err);
+  }
+ 
+  return Tag.find( { $and: [{_id: { $in: tags }, userId }] })
     .then(results => {
-      if (tags.length !== results.length) {
-        const err = new Error();
-        err.message = 'The `tags` array contains an invalid id';
+      if(tags.length !== results.length) {
+        const err = new Error('The tags array contains an invalid id');
         err.status = 400;
         return Promise.reject(err);
       }
@@ -143,19 +148,6 @@ router.post('/', jwtAuth, (req, res, next) => {
       validateFolderId(folderId, userId),
       validateTagIds(tags, userId)
     ])
-    .catch(err => {
-      if (err === 'InvalidFolder') {
-        err = new Error();
-        err.message = 'The folder is not valid';
-        err.status = 400;
-      }
-      if (err === 'InvalidTag') {
-        err = new Error();
-        err.message = 'The tag is not valid';
-        err.status = 400;
-      }
-      next(err);
-    })
     .then(() => {
       return Note.create(newNote);
     })
@@ -215,7 +207,7 @@ router.put('/:id', jwtAuth, (req, res, next) => {
     err.status = 400;
     return next(err);
   }
-  if (title === '') {
+  if (!title) {
     const err = new Error();
     err.message = 'Missing `title` in request body';
     err.status = 400;
@@ -230,9 +222,9 @@ router.put('/:id', jwtAuth, (req, res, next) => {
       return next(err);
     }
   }
-  if (mongoose.Types.ObjectId.isValid(folderId)) {
-    updateNote.folderId = folderId;
-  }
+  // if (mongoose.Types.ObjectId.isValid(folderId)) {
+  //   updateNote.folderId = folderId;
+  // }
   if (!folderId) {
     updateNote.folderId = null;
   }
@@ -242,19 +234,6 @@ router.put('/:id', jwtAuth, (req, res, next) => {
       validateFolderId(folderId, userId),
       validateTagIds(tags, userId)
     ])
-    .catch(err => {
-      if (err === 'InvalidFolder') {
-        err = new Error();
-        err.message = 'The folder is not valid';
-        err.status = 400;
-      }
-      if (err === 'InvalidTag') {
-        err = new Error();
-        err.message = 'The tag is not valid';
-        err.status = 400;
-      }
-      next(err);
-    })
     .then(() => {
       return Note
         .findByIdAndUpdate(id, updateNote, { new: true })
