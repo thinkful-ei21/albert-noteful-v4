@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 const app = require('../server.js');
+
 const Note = require('../models/note.js');
 const Folder = require('../models/folder.js');
 const Tag = require('../models/tag.js');
@@ -130,8 +131,9 @@ describe('Noteful API - Notes', function() {
           expect(res.body).to.be.an('array');
           expect(res.body).to.have.length(1);
           res.body.forEach((item, i) => {
-            expect(item).to.be.a('object');
-            expect(item).to.include.all.keys('id', 'title', 'createdAt', 'updatedAt', 'tags', 'userId'); // Note: folderId and content are optional
+            expect(item).to.be.an('object');
+            // Note: folderId and content are optional
+            expect(item).to.include.all.keys('id', 'title', 'createdAt', 'updatedAt', 'tags', 'userId');
             expect(item.id).to.equal(data[i].id);
             expect(item.title).to.equal(data[i].title);
             expect(item.content).to.equal(data[i].content);
@@ -282,7 +284,7 @@ describe('Noteful API - Notes', function() {
           expect(res).to.have.status(201);
           expect(res).to.have.header('location');
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body).to.have.all.keys('id', 'title', 'content', 'createdAt', 'updatedAt', 'folderId', 'tags', 'userId');
           return Note
             .findOne({userId: user.id, _id: res.body.id});
@@ -308,7 +310,7 @@ describe('Noteful API - Notes', function() {
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body.message).to.equal('Missing `title` in request body');
         });
     });

@@ -9,7 +9,8 @@
 	"main": "server.js",
 	"scripts": {
 		"start": "node server.js",
-		"test": "cross-env NODE_ENV=test mocha --file test/server.test.js"
+		"test": "cross-env NODE_ENV=test mocha --file test/server-test.js",
+		"cover": "nyc --reporter=lcov --reporter=text npm test"
 	},
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
@@ -28,6 +29,7 @@
 		"chai": "^4.1.2",
 		"chai-http": "^4.0.0",
 		"cross-env": "^5.1.4",
-		"mocha": "^5.1.1"
+		"mocha": "^5.1.1",
+		"nyc": "^12.0.2"
 	}
 }

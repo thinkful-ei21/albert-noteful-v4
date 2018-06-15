@@ -4,11 +4,11 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 
-const app = require('../server');
+const app = require('../server.js');
 
-const User = require('../models/user');
+const User = require('../models/user.js');
 
-const { TEST_MONGODB_URI } = require('../config');
+const { TEST_MONGODB_URI } = require('../config.js');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -34,7 +34,7 @@ describe('Noteful API - Users', function() {
   after(function() {
     return mongoose.disconnect();
   });
-  
+
   describe('/api/users', function() {
     describe('POST', function() {
       it('Should create a new user', function() {
