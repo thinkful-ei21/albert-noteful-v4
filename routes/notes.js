@@ -21,7 +21,7 @@ const validateFolderId = function(folderId, userId) {
   }
   if (!mongoose.Types.ObjectId.isValid(folderId)) {
     const err = new Error();
-    err.message = 'The `folderId` is not valid';
+    err.message = 'The `folderId` is invalid';
     err.status = 400;
     return Promise.reject(err);
   }
@@ -30,7 +30,7 @@ const validateFolderId = function(folderId, userId) {
     .then(count => {
       if (count === 0) {
         const err = new Error();
-        err.message = 'The `folderId` is not valid';
+        err.message = 'The `folderId` is invalid';
         err.status = 400;
         return Promise.reject(err);
       }
@@ -49,7 +49,7 @@ const validateTagIds = function(tags, userId) {
 
   const badIds = tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
   if (badIds.length) {
-    const err = new Error('The tags `id` is not valid');
+    const err = new Error('The tags `id` is invalid');
     err.status = 400;
     return Promise.reject(err);
   }
@@ -106,7 +106,7 @@ router.get('/:id', jwtAuth, (req, res, next) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error();
-    err.message = 'The `id` is not valid';
+    err.message = 'The `id` is invalid';
     err.status = 400;
     return next(err);
   }
@@ -160,37 +160,6 @@ router.post('/', jwtAuth, (req, res, next) => {
     .catch(err => {
       next(err);
     });
-  // if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
-  //   const err = new Error();
-  //   err.message = 'The `folderId` is not valid';
-  //   err.status = 400;
-  //   return next(err);
-  // }
-  // if (tags) {
-  //   tags.forEach((tag) => {
-  //     if (!mongoose.Types.ObjectId.isValid(tag)) {
-  //       const err = new Error();
-  //       err.message = 'The tags `id` is not valid';
-  //       err.status = 400;
-  //       return next(err);
-  //     }
-  //   });
-  // }
-  // const newNote = { title, content, userId, folderId, tags };
-  // if (!folderId) {
-  //   newNote.folderId = null;
-  // }
-  // Note
-  //   .create(newNote)
-  //   .then(result => {
-  //     res
-  //       .location(`${req.originalUrl}/${result.id}`)
-  //       .status(201)
-  //       .json(result);
-  //   })
-  //   .catch(err => {
-  //     next(err);
-  //   });
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
@@ -203,7 +172,7 @@ router.put('/:id', jwtAuth, (req, res, next) => {
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error();
-    err.message = 'The `id` is not valid';
+    err.message = 'The `id` is invalid';
     err.status = 400;
     return next(err);
   }
@@ -217,7 +186,7 @@ router.put('/:id', jwtAuth, (req, res, next) => {
     const badIds = tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
     if (badIds.length) {
       const err = new Error();
-      err.message = 'The tags `id` is not valid';
+      err.message = 'The tags `id` is invalid';
       err.status = 400;
       return next(err);
     }
@@ -311,7 +280,7 @@ router.delete('/:id', jwtAuth, (req, res, next) => {
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error();
-    err.message = 'The `id` is not valid';
+    err.message = 'The `id` is invalid';
     err.status = 400;
     return next(err);
   }

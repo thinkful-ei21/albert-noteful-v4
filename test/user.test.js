@@ -1,19 +1,19 @@
 'use strict';
 
-const app = require('../server');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 
-const { TEST_MONGODB_URI } = require('../config');
+const app = require('../server');
 
 const User = require('../models/user');
 
-const expect = chai.expect;
+const { TEST_MONGODB_URI } = require('../config');
 
 chai.use(chaiHttp);
+const expect = chai.expect;
 
-describe.only('Noteful API - Users', function() {
+describe('Noteful API - Users', function() {
   const username = 'exampleUser';
   const password = 'examplePassword';
   const fullname = 'Example User';

@@ -149,7 +149,7 @@ router.delete('/:id', jwtAuth, (req, res, next) => {
   /***** Never trust users - validate input *****/
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error();
-    err.message = 'The `id` is not valid';
+    err.message = 'The `id` is invalid';
     err.status = 400;
     return next(err);
   }
