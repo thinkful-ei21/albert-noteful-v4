@@ -1,7 +1,7 @@
 /* global $ noteful api store */
 'use strict';
 
-$(document).ready(function () {
+$(document).ready(function() {
   noteful.bindEventListeners();
 
   noteful.render();

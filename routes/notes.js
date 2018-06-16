@@ -14,7 +14,6 @@ const jwtAuth = passport.authenticate('jwt', { session: false, failWithError: tr
 // Protects all endpoints, or each can be applied to specific handlers as below
 // router.use(jwtAuth);
 
-
 const validateFolderId = function(folderId, userId) {
   if (!folderId) {
     return Promise.resolve();
@@ -54,7 +53,8 @@ const validateTagIds = function(tags, userId) {
     return Promise.reject(err);
   }
  
-  return Tag.find( { $and: [{_id: { $in: tags }, userId }] })
+  return Tag
+    .find( { $and: [{_id: { $in: tags }, userId }] })
     .then(results => {
       if(tags.length !== results.length) {
         const err = new Error('The tags array contains an invalid id');
@@ -191,9 +191,6 @@ router.put('/:id', jwtAuth, (req, res, next) => {
       return next(err);
     }
   }
-  // if (mongoose.Types.ObjectId.isValid(folderId)) {
-  //   updateNote.folderId = folderId;
-  // }
   if (!folderId) {
     updateNote.folderId = null;
   }
@@ -219,58 +216,6 @@ router.put('/:id', jwtAuth, (req, res, next) => {
       next(err);
     });
 });
-
-/* ========== PUT/UPDATE A SINGLE ITEM ========== */
-// router.put('/:id', jwtAuth, (req, res, next) => {
-//   const { id } = req.params;
-//   const { title, content, folderId, tags = [] } = req.body;
-//   const userId = req.user.id;
-
-//   /***** Never trust users - validate input *****/
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     const err = new Error();
-//     err.message = 'The `id` is not valid';
-//     err.status = 400;
-//     return next(err);
-//   }
-//   if (title === '') {
-//     const err = new Error();
-//     err.message = 'Missing `title` in request body';
-//     err.status = 400;
-//     return next(err);
-//   }
-//   if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
-//     const err = new Error();
-//     err.message = 'The `folderId` is not valid';
-//     err.status = 400;
-//     return next(err);
-//   }
-//   if (tags) {
-//     const badIds = tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
-//     if (badIds.length) {
-//       const err = new Error();
-//       err.message = 'The tags `id` is not valid';
-//       err.status = 400;
-//       return next(err);
-//     }
-//   }
-//   const updateNote = { title, content, userId, folderId, tags };
-//   if (!folderId) {
-//     updateNote.folderId = null;
-//   }
-//   Note
-//     .findOneAndUpdate({_id: id, userId}, updateNote, {new: true})
-//     .then(result => {
-//       if (result) {
-//         res.json(result);
-//       } else {
-//         next();
-//       }
-//     })
-//     .catch(err => {
-//       next(err);
-//     });
-// });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', jwtAuth, (req, res, next) => {

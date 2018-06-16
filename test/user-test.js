@@ -144,7 +144,7 @@ describe('Noteful API - Users', function() {
             expect(res.body.message).to.equal('Field: \'username\' must be at least 6 characters long');
           });
       });
-      it('Should reject users with password less than 8 characters', function () {
+      it('Should reject users with password less than 8 characters', function() {
         const testUser = { username, password: '123' };
         return chai
           .request(app)

@@ -75,7 +75,7 @@ describe('Noteful API - Folders', function() {
         });
     });
 
-    it('should return a list with the correct fields and values', function () {
+    it('should return a list with the correct fields and values', function() {
       return Promise
         .all([
           Folder

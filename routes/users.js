@@ -11,7 +11,7 @@ router.post('/', (req, res, next) => {
   const { username, password } = req.body;
   let { fullname } = req.body;
 
-  if(fullname) {
+  if (fullname) {
     fullname = fullname.trim();
   }
   

@@ -10,7 +10,7 @@
 	"scripts": {
 		"start": "node server.js",
 		"test": "cross-env NODE_ENV=test mocha --file test/server-test.js",
-		"cover": "nyc --reporter=lcov --reporter=text npm test"
+		"coverage": "nyc --reporter=lcov --reporter=text npm test"
 	},
 	"dependencies": {
 		"bcryptjs": "^2.4.3",

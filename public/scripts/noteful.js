@@ -1,7 +1,7 @@
 /* global $ store api moment */
 'use strict';
 
-const noteful = (function () {
+const noteful = (function() {
 
   function showSuccessMessage(message) {
     const el = $('.js-success-message');
@@ -166,7 +166,7 @@ const noteful = (function () {
 
 
   function handleNoteFormSubmit() {
-    $('.js-note-edit-form').on('submit', function (event) {
+    $('.js-note-edit-form').on('submit', function(event) {
       event.preventDefault();
 
       const editForm = $(event.currentTarget);

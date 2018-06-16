@@ -40,16 +40,20 @@ describe('Noteful API - Notes', function() {
         return Promise
           .all([
             User.insertMany(seedUsers),
+            User.createIndexes(),
+
             Folder.insertMany(seedFolders),
             Folder.createIndexes(),
+
             Tag.insertMany(seedTags),
             Tag.createIndexes(),
-            Note.insertMany(seedNotes),
+            
+            Note.insertMany(seedNotes)
           ]);
       })
       .then(([users]) => {
         user = users[0];
-        token = jwt.sign({ user }, JWT_SECRET, { subject: user.username });
+        token = jwt.sign({ user }, JWT_SECRET, {subject: user.username});
       });
   });
 
@@ -103,6 +107,7 @@ describe('Noteful API - Notes', function() {
             expect(item.id).to.equal(data[i].id);
             expect(item.title).to.equal(data[i].title);
             expect(item.content).to.equal(data[i].content);
+            expect(item.userId).to.equal(data[i].userId.toHexString()); // what
             expect(new Date(item.createdAt)).to.eql(data[i].createdAt);
             expect(new Date(item.updatedAt)).to.eql(data[i].updatedAt);
           });
@@ -152,7 +157,7 @@ describe('Noteful API - Notes', function() {
           return Promise
             .all([
               Note
-                .find({ folderId: data.id }),
+                .find({userId: user.id, folderId: data.id }),
               chai
                 .request(app)
                 .get(`/api/notes?folderId=${data.id}`)
@@ -237,6 +242,7 @@ describe('Noteful API - Notes', function() {
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
+          expect(res.body.userId).to.equal(data.userId.toHexString()); // what
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
@@ -293,6 +299,7 @@ describe('Noteful API - Notes', function() {
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
+          expect(res.body.userId).to.equal(data.userId.toHexString()); // what
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
@@ -381,6 +388,7 @@ describe('Noteful API - Notes', function() {
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(updateItem.title);
           expect(res.body.content).to.equal(updateItem.content);
+          expect(res.body.userId).to.equal(data.userId.toHexString()); // what
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           // expect note to have been updated
           expect(new Date(res.body.updatedAt)).to.greaterThan(data.updatedAt);
@@ -464,8 +472,8 @@ describe('Noteful API - Notes', function() {
 
     it('should return an error when a tags `id` is not valid ', function() {
       const updateItem = {
-        tags: ['NOT-A-VALID-ID'],
-        title: 'Sample Title'
+        title: 'Sample Title',
+        tags: ['NOT-A-VALID-ID']
       };
       return Note
         .findOne({userId: user.id})
